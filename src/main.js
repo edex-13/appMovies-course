@@ -17,6 +17,9 @@ const createMovies = (movies, nodo) => {
   movies.forEach((movie) => {
     const movieContainer = document.createElement("div");
     movieContainer.classList.add("movie-container");
+    movieContainer.addEventListener("click", () => {
+      location.hash = `#movie=${movie.id}`;
+    });
 
     const movieImg = document.createElement("img");
     movieImg.classList.add("movie-img");
@@ -103,3 +106,41 @@ const getMoviesBySearch = async (query) => {
 
   createMovies(movies, genericSection);
 };
+
+const getMovieDetails = async (movieId) => {
+  const { data: movie } = await api(`movie/${movieId}`, {
+    params: {
+      language: "es-CO",
+    },
+
+  });
+  const movieImgUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+
+  headerSection.style.background = `
+  linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.35) 19.27%,
+      rgba(0, 0, 0, 0) 29.17%
+    ),
+  url(${movieImgUrl})
+  `;
+
+  movieDetailTitle.textContent = movie.title;
+  movieDetailDescription.textContent = movie.overview;
+  movieDetailScore.textContent = movie.vote_average;
+
+  createCategories(movie.genres, movieDetailCategoriesList);
+  getRelatedMovies(movieId);
+};
+
+const getRelatedMovies = async (movieId) => {
+  const { data } = await api(`movie/${movieId}/similar`, {
+    params: {
+      language: "es-CO",
+    },
+  });
+
+  const movies = data.results;
+
+  createMovies(movies, relatedMoviesContainer);
+}

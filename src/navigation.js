@@ -60,6 +60,10 @@ const movieDetailsPage = () => {
   categoriesPreviewSection.classList.add('inactive');
   genericSection.classList.add('inactive');
   movieDetailSection.classList.remove('inactive');
+
+  const { hash: HASH_URL } = location;
+  const [_,movieId] = HASH_URL.split('=')
+  getMovieDetails(movieId);
 };
 
 const categoriesPage = () => {
