@@ -22,7 +22,8 @@ const trendsPage = () => {
   genericSection.classList.remove('inactive');
   movieDetailSection.classList.add('inactive');
 
-  console.log("trends");
+  headerCategoryTitle.innerText= "Tendencias";
+  getTrendingMovies();
 };
 const searchPage = () => {
 

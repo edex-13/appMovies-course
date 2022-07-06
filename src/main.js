@@ -55,6 +55,13 @@ const createCategories = (categories, nodo) => {
 
 // API
 
+const getTrendingMovies = async () => {
+  const { data } = await api(`/trending/movie/day`);
+  const movies = data.results;
+
+  createMovies(movies, genericSection);
+};
+
 const getTrendingMoviesPreview = async () => {
   const { data } = await api(`/trending/movie/day`);
   const movies = data.results;
