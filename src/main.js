@@ -9,13 +9,11 @@ const api = axios.create({
     api_key: API_KEY,
   },
 });
+//  DOM
 
-const getTrendingMoviesPreview = async () => {
-  const { data } = await api(`/trending/movie/day`);
+const createMovies = (movies, nodo) => {
+  nodo.innerHTML = "";
 
-  const movies = data.results;
-
-  trendingMoviesPreviewList.innerHTML= "";
   movies.forEach((movie) => {
     const movieContainer = document.createElement("div");
     movieContainer.classList.add("movie-container");
@@ -29,20 +27,13 @@ const getTrendingMoviesPreview = async () => {
     );
 
     movieContainer.appendChild(movieImg);
-    trendingMoviesPreviewList.appendChild(movieContainer);
+    nodo.appendChild(movieContainer);
   });
 };
 
-const getCategoriesPreview = async () => {
-  
+const createCategories = (categories, nodo) => {
+  nodo.innerHTML = "";
 
-  const { data } = await api(
-    `/genre/movie/list?api_key=${API_KEY}&language=ES`
-  );
-
-  const categories = data.genres;
-
-  categoriesPreviewList.innerHTML = "";
   categories.forEach((category) => {
     const categoryContainer = document.createElement("div");
     categoryContainer.classList.add("category-container");
@@ -50,13 +41,58 @@ const getCategoriesPreview = async () => {
     const categoryTitle = document.createElement("h3");
     categoryTitle.classList.add("category-title");
     categoryTitle.setAttribute("id", `id${category.id}`);
+    categoryTitle.addEventListener("click", () => {
+      location.hash = `#category=${category.id}-${category.name}`;
+    });
 
     const categoryTitleText = document.createTextNode(category.name);
 
     categoryTitle.appendChild(categoryTitleText);
     categoryContainer.appendChild(categoryTitle);
-    categoriesPreviewList.appendChild(categoryContainer);
+    nodo.appendChild(categoryContainer);
   });
 };
 
+// API
 
+const getTrendingMoviesPreview = async () => {
+  const { data } = await api(`/trending/movie/day`);
+  const movies = data.results;
+
+  createMovies(movies, trendingMoviesPreviewList);
+};
+
+const getCategoriesPreview = async () => {
+  const { data } = await api(`/genre/movie/list`, {
+    params: {
+      language: "es-CO",
+    },
+  });
+  const categories = data.genres;
+  createCategories(categories, categoriesPreviewList);
+};
+
+const getMoviesByCategory = async (categoryId) => {
+  const { data } = await api(`discover/movie`, {
+    params: {
+      with_genres: categoryId,
+    },
+  });
+
+  const movies = data.results;
+
+  createMovies(movies, genericSection);
+};
+
+const getMoviesBySearch = async (query) => {
+  const { data } = await api(`search/movie`, {
+    params: {
+      query,
+      language: "es-CO",
+    },
+  });
+
+  const movies = data.results;
+
+  createMovies(movies, genericSection);
+};

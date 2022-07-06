@@ -1,11 +1,11 @@
 searchFormBtn.addEventListener('click', ()=>{
-  location.hash = "#search="
+  location.hash = "#search=" + searchFormInput.value;
 })
 trendingBtn.addEventListener('click', ()=>{
   location.hash = "#trends"
 })
 arrowBtn.addEventListener('click', ()=>{
-  location.hash = "#home"
+  history.back()
 })
 const trendsPage = () => {
   
@@ -38,7 +38,11 @@ const searchPage = () => {
   categoriesPreviewSection.classList.add('inactive');
   genericSection.classList.remove('inactive');
   movieDetailSection.classList.add('inactive');
-  console.log("search");
+  
+
+  const { hash: HASH_URL } = location;
+  const [_,query] = HASH_URL.split('=')
+  getMoviesBySearch(decodeURI(query))
 };
 const movieDetailsPage = () => {
   console.log("movie");
@@ -72,6 +76,12 @@ const categoriesPage = () => {
   categoriesPreviewSection.classList.add('inactive');
   genericSection.classList.remove('inactive');
   movieDetailSection.classList.add('inactive');
+
+  const { hash: HASH_URL } = location;
+  const [_,categoryDataUrl] = HASH_URL.split('=')
+  const [categoryId, categoryName] = categoryDataUrl.split('-')
+  headerCategoryTitle.innerText= decodeURI(categoryName);
+  getMoviesByCategory(categoryId);
 };
 const homePage = () => {
   headerSection.classList.remove('header-container--long');
@@ -98,6 +108,8 @@ const navigator = () => {
   HASH_URL.startsWith('#movie=')    ? movieDetailsPage() :
   HASH_URL.startsWith('#category=') ? categoriesPage()   :
   homePage()
+
+  window.scrollTo( 0 ,0);
 };
 window.addEventListener("hashchange", navigator, false);
 window.addEventListener("DOMContentLoaded", navigator, false);
