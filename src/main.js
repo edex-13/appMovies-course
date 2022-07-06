@@ -62,5 +62,4 @@ const getCategoriesPreview = async () => {
   });
 };
 
-getTrendingMoviesPreview();
-getCategoriesPreview();
+
