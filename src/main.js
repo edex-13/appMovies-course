@@ -9,10 +9,23 @@ const api = axios.create({
     api_key: API_KEY,
   },
 });
+
+const lazyLoader = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const { src, alt } = entry.target.dataset;
+      entry.target.setAttribute("src", src);
+      entry.target.setAttribute("alt", alt);
+    }
+  });
+});
+
 //  DOM
 
-const createMovies = (movies, nodo) => {
-  nodo.innerHTML = "";
+const createMovies = (movies, nodo, clean = true) => {
+  if (clean) {
+    nodo.innerHTML = "";
+  }
 
   movies.forEach((movie) => {
     const movieContainer = document.createElement("div");
@@ -23,11 +36,20 @@ const createMovies = (movies, nodo) => {
 
     const movieImg = document.createElement("img");
     movieImg.classList.add("movie-img");
-    movieImg.setAttribute("alt", movie.title);
+    movieImg.setAttribute("data-alt", movie.title);
     movieImg.setAttribute(
-      "src",
+      "data-src",
       `https://image.tmdb.org/t/p/w300/${movie.poster_path}`
     );
+
+    lazyLoader.observe(movieImg);
+
+    movieImg.addEventListener("error", () => {
+      movieImg.setAttribute(
+        "src",
+        `https://via.placeholder.com/300x450/5c218a/ffffff?text=${movie.title}`
+      );
+    });
 
     movieContainer.appendChild(movieImg);
     nodo.appendChild(movieContainer);
@@ -61,9 +83,29 @@ const createCategories = (categories, nodo) => {
 const getTrendingMovies = async () => {
   const { data } = await api(`/trending/movie/day`);
   const movies = data.results;
+  totalPages = data.total_pages;
 
   createMovies(movies, genericSection);
 };
+
+const getPaginatedTrendingMovies = async () => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  const scrrollIsAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+  const pageIsNotMax = page <= totalPages;
+  if (scrrollIsAtBottom && pageIsNotMax) {
+    page++;
+    const { data } = await api(`/trending/movie/day`, {
+      params: {
+        page,
+      },
+    });
+    const movies = data.results;
+
+    createMovies(movies, genericSection, false);
+  }
+};
+
 
 const getTrendingMoviesPreview = async () => {
   const { data } = await api(`/trending/movie/day`);
@@ -112,7 +154,6 @@ const getMovieDetails = async (movieId) => {
     params: {
       language: "es-CO",
     },
-
   });
   const movieImgUrl = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
 
@@ -143,4 +184,4 @@ const getRelatedMovies = async (movieId) => {
   const movies = data.results;
 
   createMovies(movies, relatedMoviesContainer);
-}
+};
