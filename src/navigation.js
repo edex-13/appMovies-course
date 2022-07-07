@@ -48,7 +48,9 @@ const searchPage = () => {
 
   const { hash: HASH_URL } = location;
   const [_,query] = HASH_URL.split('=')
-  getMoviesBySearch(decodeURI(query))
+  const decodeQuery = decodeURI(query)
+  getMoviesBySearch(decodeQuery)
+  infiniteScroll = getPaginatedMoviesBySearch(decodeQuery)
 };
 const movieDetailsPage = () => {
   console.log("movie");

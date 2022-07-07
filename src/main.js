@@ -133,13 +133,11 @@ const getMoviesByCategory = async (categoryId) => {
   const movies = data.results;
   totalPages = data.total_pages;
 
-
   createMovies(movies, genericSection);
 };
 
 const getPaginatedMoviesByCategory = (categoryId) => {
   const closure = async () => {
-    console.log("hola");
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
     const scrrollIsAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
@@ -156,7 +154,7 @@ const getPaginatedMoviesByCategory = (categoryId) => {
 
       const movies = data.results;
 
-      createMovies(movies, genericSection , false);
+      createMovies(movies, genericSection, false);
     }
   };
   return closure;
@@ -171,8 +169,34 @@ const getMoviesBySearch = async (query) => {
   });
 
   const movies = data.results;
+  totalPages = data.total_pages;
+
 
   createMovies(movies, genericSection);
+};
+const getPaginatedMoviesBySearch = (query) => {
+  const closure = async () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    const scrrollIsAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+    const pageIsNotMax = page <= totalPages;
+
+    if (scrrollIsAtBottom && pageIsNotMax) {
+      page++;
+      const { data } = await api(`search/movie`, {
+        params: {
+          query,
+          language: "es-CO",
+          page,
+        },
+      });
+
+      const movies = data.results;
+
+      createMovies(movies, genericSection , false);
+    }
+  };
+  return closure;
 };
 
 const getMovieDetails = async (movieId) => {
