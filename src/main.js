@@ -106,7 +106,6 @@ const getPaginatedTrendingMovies = async () => {
   }
 };
 
-
 const getTrendingMoviesPreview = async () => {
   const { data } = await api(`/trending/movie/day`);
   const movies = data.results;
@@ -132,8 +131,35 @@ const getMoviesByCategory = async (categoryId) => {
   });
 
   const movies = data.results;
+  totalPages = data.total_pages;
+
 
   createMovies(movies, genericSection);
+};
+
+const getPaginatedMoviesByCategory = (categoryId) => {
+  const closure = async () => {
+    console.log("hola");
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    const scrrollIsAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+    const pageIsNotMax = page <= totalPages;
+
+    if (scrrollIsAtBottom && pageIsNotMax) {
+      page++;
+      const { data } = await api(`discover/movie`, {
+        params: {
+          with_genres: categoryId,
+          page,
+        },
+      });
+
+      const movies = data.results;
+
+      createMovies(movies, genericSection , false);
+    }
+  };
+  return closure;
 };
 
 const getMoviesBySearch = async (query) => {

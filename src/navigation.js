@@ -91,6 +91,8 @@ const categoriesPage = () => {
   const [_,categoryDataUrl] = HASH_URL.split('=')
   const [categoryId, categoryName] = categoryDataUrl.split('-')
   headerCategoryTitle.innerText= decodeURI(categoryName);
+
+  infiniteScroll = getPaginatedMoviesByCategory(categoryId)
   getMoviesByCategory(categoryId);
 };
 const homePage = () => {
