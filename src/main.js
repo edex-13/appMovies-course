@@ -10,6 +10,28 @@ const api = axios.create({
   },
 });
 
+const likedMoviesListInLocalStorage = () => {
+  const likedMovies = localStorage.getItem("likedMovies");
+  if (likedMovies) {
+    return JSON.parse(likedMovies);
+  }
+  return {};
+}
+
+
+const likeMovie = (movie)=>{
+  const likedMovies = likedMoviesListInLocalStorage();
+
+
+  if (likedMovies[movie.id]) {
+    delete likedMovies[movie.id];
+  }
+  else {
+    likedMovies[movie.id] = movie;
+  }
+  localStorage.setItem("likedMovies", JSON.stringify(likedMovies));
+}
+
 const lazyLoader = new IntersectionObserver((entries, observer) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -22,17 +44,16 @@ const lazyLoader = new IntersectionObserver((entries, observer) => {
 
 //  DOM
 
-const createMovies = (movies, nodo, clean = true) => {
+const createMovies = (movies, nodo, clean = true ) => {
   if (clean) {
     nodo.innerHTML = "";
   }
+  const favoriteMovies = likedMoviesListInLocalStorage();
 
   movies.forEach((movie) => {
     const movieContainer = document.createElement("div");
     movieContainer.classList.add("movie-container");
-    movieContainer.addEventListener("click", () => {
-      location.hash = `#movie=${movie.id}`;
-    });
+    
 
     const movieImg = document.createElement("img");
     movieImg.classList.add("movie-img");
@@ -50,8 +71,22 @@ const createMovies = (movies, nodo, clean = true) => {
         `https://via.placeholder.com/300x450/5c218a/ffffff?text=${movie.title}`
       );
     });
+    movieImg.addEventListener("click", () => {
+      location.hash = `#movie=${movie.id}`;
+    });
+
+    const saveFavorite = document.createElement("button");
+    saveFavorite.classList.add("movie-btn");
+    favoriteMovies[movie.id] && saveFavorite.classList.add('movie-btn--liked');
+
+    saveFavorite.addEventListener("click", ()=>{
+      saveFavorite.classList.toggle("movie-btn--liked");
+      likeMovie(movie);
+      getLikeMovies();
+    })
 
     movieContainer.appendChild(movieImg);
+    movieContainer.appendChild(saveFavorite);
     nodo.appendChild(movieContainer);
   });
 };
@@ -235,3 +270,9 @@ const getRelatedMovies = async (movieId) => {
 
   createMovies(movies, relatedMoviesContainer);
 };
+
+const getLikeMovies =  () => {
+  const likedMovies = likedMoviesListInLocalStorage();
+
+  createMovies(Object.values(likedMovies), likedMoviesSection);
+}

@@ -13,6 +13,7 @@ const trendingMoviesPreviewList = $getNode('.trendingPreview-movieList');
 const categoriesPreviewList = $getNode('.categoriesPreview-list');
 const movieDetailCategoriesList = $getNode('#movieDetail .categories-list');
 const relatedMoviesContainer = $getNode('.relatedMovies-scrollContainer');
+const likedMoviesSection = $getNode('.liked-movieList');
 
 // Elements
 const headerTitle = $getNode('.header-title');
